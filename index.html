@@ -1,0 +1,140 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Islamic Inheritance Calculator</title>
+    <style>
+        /* ===== CSS ===== */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            background-color: white;
+            padding: 20px 30px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            width: 350px;
+        }
+        h1 {
+            text-align: center;
+        }
+        label {
+            display: block;
+            margin-top: 10px;
+        }
+        input, select {
+            width: 100%;
+            padding: 5px;
+            margin-top: 5px;
+        }
+        button {
+            margin-top: 15px;
+            padding: 10px;
+            width: 100%;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        #results {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Islamic Inheritance Calculator</h1>
+        <form id="inheritanceForm">
+            <label for="estate">Total Estate (£):</label>
+            <input type="number" id="estate" required>
+
+            <label for="wife">Number of Wives:</label>
+            <input type="number" id="wife" value="1" min="0">
+
+            <label for="sons">Number of Sons:</label>
+            <input type="number" id="sons" value="0" min="0">
+
+            <label for="daughters">Number of Daughters:</label>
+            <input type="number" id="daughters" value="0" min="0">
+
+            <label for="father">Father Alive?</label>
+            <select id="father">
+                <option value="yes">Yes</option>
+                <option value="no">No</option>
+            </select>
+
+            <label for="mother">Mother Alive?</label>
+            <select id="mother">
+                <option value="yes">Yes</option>
+                <option value="no">No</option>
+            </select>
+
+            <button type="button" onclick="calculateInheritance()">Calculate</button>
+        </form>
+
+        <div id="results"></div>
+    </div>
+
+    <script>
+        // ===== JavaScript =====
+        function calculateInheritance() {
+            let estate = parseFloat(document.getElementById('estate').value);
+            let wives = parseInt(document.getElementById('wife').value);
+            let sons = parseInt(document.getElementById('sons').value);
+            let daughters = parseInt(document.getElementById('daughters').value);
+            let fatherAlive = document.getElementById('father').value === "yes";
+            let motherAlive = document.getElementById('mother').value === "yes";
+
+            let results = "";
+
+            // Wife share
+            let wifeShare = 0;
+            if (wives > 0) {
+                wifeShare = sons + daughters > 0 ? estate * 0.125 : estate * 0.25;
+                results += `<p>Wife(s) share: £${wifeShare.toFixed(2)}</p>`;
+            }
+
+            // Remaining estate after wife's share
+            let remaining = estate - wifeShare;
+
+            // Mother share
+            let motherShare = 0;
+            if (motherAlive) {
+                motherShare = (sons + daughters > 0) ? remaining / 6 : remaining / 3;
+                results += `<p>Mother's share: £${motherShare.toFixed(2)}</p>`;
+                remaining -= motherShare;
+            }
+
+            // Father share
+            let fatherShare = 0;
+            if (fatherAlive) {
+                fatherShare = remaining / 6;
+                results += `<p>Father's share: £${fatherShare.toFixed(2)}</p>`;
+                remaining -= fatherShare;
+            }
+
+            // Children share
+            let totalShares = sons * 2 + daughters * 1;
+            if (totalShares > 0) {
+                let perShare = remaining / totalShares;
+                if (sons > 0) results += `<p>Son(s) share: £${(perShare*2*sons).toFixed(2)}</p>`;
+                if (daughters > 0) results += `<p>Daughter(s) share: £${(perShare*daughters).toFixed(2)}</p>`;
+            }
+
+            document.getElementById('results').innerHTML = results;
+        }
+    </script>
+</body>
+</html>
